@@ -5,5 +5,6 @@ import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
-    fun getRestaurants(): Flow<Resource<List<Restaurant>>>
+    suspend fun loadRestaurants()
+    fun getRestaurants(): Flow<List<Restaurant>>
 }
