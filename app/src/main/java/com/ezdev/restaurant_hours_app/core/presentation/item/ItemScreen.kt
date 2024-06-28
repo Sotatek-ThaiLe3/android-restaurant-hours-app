@@ -3,21 +3,21 @@ package com.ezdev.restaurant_hours_app.core.presentation.item
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
 
 @Composable
 fun ItemScreen(
     modifier: Modifier = Modifier,
-    viewModel: ItemViewModel = viewModel()
+    viewModel: ItemViewModel = hiltViewModel()
 ) {
-    val restaurant: Restaurant by viewModel.item
+    val restaurant: Restaurant by viewModel.restaurant.collectAsStateWithLifecycle()
 
     ItemBody(restaurant = restaurant, modifier = modifier)
 }
@@ -31,5 +31,7 @@ private fun ItemBody(restaurant: Restaurant, modifier: Modifier = Modifier) {
     ) {
         Text(text = restaurant.name)
         Text(text = restaurant.operatingHours)
+        Text(text = restaurant.isOpening.toString())
+        Text(text = restaurant.weeklyCalendar.toString())
     }
 }

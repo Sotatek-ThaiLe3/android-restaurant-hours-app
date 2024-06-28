@@ -5,5 +5,7 @@
 - [x] App architecture
 - [x] App navigation
 - [x] Dependency injection
-- [ ] UI: Open/Closed status
+- [x] Logic app
+- [ ] Design UI / UX
+- [ ] Feature: pull to refresh, observe network change, random background...
 - [ ] Testing

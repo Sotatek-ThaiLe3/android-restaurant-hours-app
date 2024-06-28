@@ -1,6 +1,8 @@
 package com.ezdev.restaurant_hours_app.core.data.repository
 
 import com.ezdev.restaurant_hours_app.core.data.local.Dao
+import com.ezdev.restaurant_hours_app.core.data.mapper.toEntity
+import com.ezdev.restaurant_hours_app.core.data.mapper.toRestaurant
 import com.ezdev.restaurant_hours_app.core.data.remote.ApiService
 import com.ezdev.restaurant_hours_app.core.data.remote.RestaurantsDto
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
@@ -21,5 +23,9 @@ class RepositoryImpl @Inject constructor(
 
     override fun getRestaurants(): Flow<List<Restaurant>> =
         dao.getRestaurantsStream().map { list -> list.map { entity -> entity.toRestaurant() } }
+
+    override fun getRestaurant(name: String): Flow<Restaurant> =
+        dao.getRestaurantStream(name).map { it?.toRestaurant() ?: Restaurant() }
+
 
 }

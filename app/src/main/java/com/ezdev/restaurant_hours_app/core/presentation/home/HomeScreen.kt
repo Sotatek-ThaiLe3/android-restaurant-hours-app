@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ezdev.restaurant_hours_app.core.data.mapper.toItem
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
 import com.ezdev.restaurant_hours_app.core.navigation.Screen
 import com.ezdev.restaurant_hours_app.ui.theme.RestaurantHoursTheme
@@ -84,7 +85,10 @@ private fun RestaurantItem(
     onNavigateToItem: (Screen.Item) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(onClick = { onNavigateToItem(restaurant.toItem()) }, modifier = modifier.fillMaxWidth()) {
+    Card(
+        onClick = { onNavigateToItem(restaurant.toItem()) },
+        modifier = modifier.fillMaxWidth()
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
