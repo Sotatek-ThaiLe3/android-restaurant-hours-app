@@ -8,7 +8,7 @@ import java.util.Locale
 
 data class Restaurant(
     val name: String = "Unknown restaurant",
-    val operatingHours: String = "Mon-Sun 0:00 am - 11:59 pm",
+    val operatingHours: String = "Mon-Sun 10:10 am - 10:00 pm",
 ) {
     val weeklyCalendar: List<String> = getWeeklyCalendar(getOperatingHourItems(operatingHours))
     val isOpening: Boolean = isOpening(weeklyCalendar)
@@ -85,8 +85,8 @@ data class Restaurant(
      * */
     private fun getCurrentOperatingHour(weeklyCalendar: List<String>): Pair<String, String> {
         val date = Date()
-        val dayFormatter = SimpleDateFormat("EEE", Locale.getDefault())
-        val hourFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        val dayFormatter = SimpleDateFormat("EEE", Locale.US)
+        val hourFormatter = SimpleDateFormat("hh:mm a", Locale.US)
         var currentDay = dayFormatter.format(date)
         val currentHour = hourFormatter.format(date)
 
@@ -94,7 +94,6 @@ data class Restaurant(
             val dayInWeek = day.substringBefore(" ")
             if (currentDay.equals(dayInWeek)) {
                 currentDay = day
-                println(day)
                 break
             }
         }
@@ -105,6 +104,7 @@ data class Restaurant(
 
     private fun isOpening(weeklyCalendar: List<String>): Boolean {
         val (currentDay, currentHour) = getCurrentOperatingHour(weeklyCalendar)
+
 
         val hoursPart: String = currentDay.substringAfter(" ", missingDelimiterValue = "")
         if (hoursPart.isBlank()) {
@@ -127,7 +127,7 @@ data class Restaurant(
 
     private fun String.toTime(): Date {
         try {
-            val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
+            val formatter = SimpleDateFormat("h:mm a", Locale.US)
             val time = formatter.parse(this.uppercase())
             return time!!
         } catch (e: ParseException) {

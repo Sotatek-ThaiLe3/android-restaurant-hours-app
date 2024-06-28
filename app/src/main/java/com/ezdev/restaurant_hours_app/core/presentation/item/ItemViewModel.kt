@@ -10,7 +10,6 @@ import com.ezdev.restaurant_hours_app.core.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -23,7 +22,6 @@ class ItemViewModel @Inject constructor(
 
     val restaurant: StateFlow<Restaurant> =
         getRestaurantUseCase(name)
-            .filterNotNull()
             .stateIn(
                 scope = viewModelScope,
                 initialValue = Restaurant(),

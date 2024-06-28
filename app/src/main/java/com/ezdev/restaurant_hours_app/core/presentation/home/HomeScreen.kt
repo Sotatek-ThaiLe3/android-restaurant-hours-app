@@ -1,47 +1,76 @@
 package com.ezdev.restaurant_hours_app.core.presentation.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ezdev.restaurant_hours_app.core.data.mapper.toItem
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
 import com.ezdev.restaurant_hours_app.core.navigation.Screen
+import com.ezdev.restaurant_hours_app.ui.SwipeRefreshLayout
 import com.ezdev.restaurant_hours_app.ui.theme.RestaurantHoursTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToItem: (Screen.Item) -> Unit,
     modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val uiState: HomeUiState by viewModel.uiState
+    val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    HomeBody(
-        uiState = uiState,
-        onNavigateToItem = onNavigateToItem,
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(title = { Text(text = "Restaurant Hours") })
+        },
         modifier = modifier
-    )
+    ) { innerPadding ->
+        HomeBody(
+            uiState = uiState,
+            onRefresh = viewModel::loadRestaurants,
+            onNavigateToItem = onNavigateToItem,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 @Composable
 private fun HomeBody(
     uiState: HomeUiState,
+    onRefresh: () -> Unit,
     onNavigateToItem: (Screen.Item) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -55,6 +84,7 @@ private fun HomeBody(
                 // TODO Restaurant List
                 RestaurantList(
                     restaurants = uiState.restaurants,
+                    onRefresh = onRefresh,
                     onNavigateToItem = onNavigateToItem,
                 )
             }
@@ -65,16 +95,27 @@ private fun HomeBody(
 @Composable
 private fun RestaurantList(
     restaurants: List<Restaurant>,
+    onRefresh: () -> Unit,
     onNavigateToItem: (Screen.Item) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(8.dp),
-        modifier = modifier
-    ) {
-        items(restaurants, key = { it.name }) { restaurant ->
-            RestaurantItem(restaurant = restaurant, onNavigateToItem = onNavigateToItem)
+    var isRefreshing by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    SwipeRefreshLayout(isRefreshing = isRefreshing, onRefresh = {
+        isRefreshing = true
+        onRefresh()
+        isRefreshing = false
+    }) {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(8.dp),
+            modifier = modifier
+        ) {
+            items(restaurants, key = { it.name }) { restaurant ->
+                RestaurantItem(restaurant = restaurant, onNavigateToItem = onNavigateToItem)
+            }
         }
     }
 }
@@ -85,21 +126,49 @@ private fun RestaurantItem(
     onNavigateToItem: (Screen.Item) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        onClick = { onNavigateToItem(restaurant.toItem()) },
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth()
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 32.dp, horizontal = 16.dp)
+                .size(16.dp)
+                .border(3.dp, Color.Black.copy(alpha = 0.5f), CircleShape)
+                .background(
+                    if (restaurant.isOpening) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    CircleShape
+                )
+        )
+        HorizontalDivider(modifier = Modifier.width(16.dp))
+        Card(
+            onClick = { onNavigateToItem(restaurant.toItem()) },
+//            colors = CardDefaults.cardColors(containerColor = if (restaurant.isOpening) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer),
+            modifier = Modifier.weight(1f)
         ) {
-            Text(text = restaurant.name)
-            Text(
-                text = if (restaurant.isOpening) "Open" else "Closed",
-                color = if (restaurant.isOpening) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                modifier = Modifier.align(Alignment.TopEnd)
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+            ) {
+                Text(text = restaurant.name, style = MaterialTheme.typography.titleLarge)
+                Text(text = restaurant.operatingHours)
+                Text(
+                    text = if (restaurant.isOpening) "Opening" else "Closed",
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+        HorizontalDivider(modifier = Modifier.width(24.dp))
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun RestaurantItemPreview() {
+    RestaurantHoursTheme {
+        Surface {
+            RestaurantItem(restaurant = Restaurant(), onNavigateToItem = {})
         }
     }
 }
@@ -109,7 +178,7 @@ private fun RestaurantItem(
 private fun Preview() {
     RestaurantHoursTheme {
         Surface {
-            HomeBody(uiState = HomeUiState(), onNavigateToItem = {})
+            HomeBody(uiState = HomeUiState(), onRefresh = {}, onNavigateToItem = {})
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.ezdev.restaurant_hours_app.core.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -25,16 +23,13 @@ fun AppNavigation(
                 navController.navigate(it)
             })
         }
-        composable<Screen.Item> { ItemScreen() }
+        composable<Screen.Item> { ItemScreen(onNavigateBack = { navController.navigateUp() }) }
     }
 
-    Scaffold(
+
+    NavHost(
+        navController = navController,
+        graph = navGraph,
         modifier = modifier
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            graph = navGraph,
-            modifier = Modifier.padding(innerPadding)
-        )
-    }
+    )
 }

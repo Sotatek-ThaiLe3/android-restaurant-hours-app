@@ -12,6 +12,7 @@ class GetRestaurantHoursUseCase @Inject constructor(
     private val repository: Repository
 ) {
     operator fun invoke(newRequest: Boolean = false): Flow<Resource<List<Restaurant>>> = flow {
+
         emit(Resource.Loading())
 
         try {
@@ -20,7 +21,6 @@ class GetRestaurantHoursUseCase @Inject constructor(
                     repository.loadRestaurants()
                 }
                 emit(Resource.Success(restaurants))
-
             }
         } catch (e: retrofit2.HttpException) {
             emit(Resource.Error("Oops, something went wrong!"))
