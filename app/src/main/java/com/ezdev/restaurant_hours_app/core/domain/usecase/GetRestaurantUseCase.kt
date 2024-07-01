@@ -1,13 +1,13 @@
 package com.ezdev.restaurant_hours_app.core.domain.usecase
 
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
-import com.ezdev.restaurant_hours_app.core.domain.repository.Repository
+import com.ezdev.restaurant_hours_app.core.domain.repository.RestaurantRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetRestaurantUseCase @Inject constructor(
-    private val repository: Repository
+    private val restaurantRepository: RestaurantRepository
 ) {
-    operator fun invoke(name: String): Flow<Restaurant> = repository.getRestaurant(name)
+    operator fun invoke(name: String): Flow<Restaurant> = restaurantRepository.getRestaurant(name)
 
 }

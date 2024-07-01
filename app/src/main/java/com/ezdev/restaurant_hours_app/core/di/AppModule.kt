@@ -2,11 +2,13 @@ package com.ezdev.restaurant_hours_app.core.di
 
 import android.content.Context
 import androidx.room.Room
+import com.ezdev.restaurant_hours_app.connectivity_observer.ConnectivityObserver
+import com.ezdev.restaurant_hours_app.connectivity_observer.NetworkConnectivityObserver
 import com.ezdev.restaurant_hours_app.core.data.local.AppDatabase
-import com.ezdev.restaurant_hours_app.core.data.local.Dao
-import com.ezdev.restaurant_hours_app.core.data.remote.ApiService
-import com.ezdev.restaurant_hours_app.core.data.repository.RepositoryImpl
-import com.ezdev.restaurant_hours_app.core.domain.repository.Repository
+import com.ezdev.restaurant_hours_app.core.data.local.RestaurantDao
+import com.ezdev.restaurant_hours_app.core.data.remote.RestaurantApiService
+import com.ezdev.restaurant_hours_app.core.data.repository.RestaurantRepositoryImpl
+import com.ezdev.restaurant_hours_app.core.domain.repository.RestaurantRepository
 import com.ezdev.restaurant_hours_app.core.domain.usecase.GetRestaurantHoursUseCase
 import com.google.gson.Gson
 import dagger.Binds
@@ -34,31 +36,38 @@ abstract class AppModule {
 
         @Singleton
         @Provides
-        fun provideDao(appDatabase: AppDatabase): Dao =
-            appDatabase.dao()
+        fun provideRestaurantDao(appDatabase: AppDatabase): RestaurantDao =
+            appDatabase.restaurantDao()
 
         @Singleton
         @Provides
         fun provideAppApi(): Retrofit =
             Retrofit.Builder()
-                .baseUrl(ApiService.BASE_URL)
+                .baseUrl(RestaurantApiService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(Gson()))
                 .build()
 
         @Singleton
         @Provides
-        fun provideApiService(
-            restaurantAppApi: Retrofit
-        ): ApiService =
-            restaurantAppApi.create(ApiService::class.java)
+        fun provideRestaurantApiService(
+            appApi: Retrofit
+        ): RestaurantApiService =
+            appApi.create(RestaurantApiService::class.java)
 
         @Singleton
         @Provides
-        fun provideGetRestaurantHoursUseCase(repository: Repository): GetRestaurantHoursUseCase =
-            GetRestaurantHoursUseCase(repository)
+        fun provideGetRestaurantHoursUseCase(
+            restaurantRepository: RestaurantRepository,
+            connectivityObserver: ConnectivityObserver
+        ): GetRestaurantHoursUseCase =
+            GetRestaurantHoursUseCase(restaurantRepository, connectivityObserver)
     }
 
     @Singleton
     @Binds
-    abstract fun bindRepository(repositoryImpl: RepositoryImpl): Repository
+    abstract fun bindRestaurantRepository(restaurantRepositoryImpl: RestaurantRepositoryImpl): RestaurantRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindConnectivityObserver(networkConnectivityObserver: NetworkConnectivityObserver): ConnectivityObserver
 }

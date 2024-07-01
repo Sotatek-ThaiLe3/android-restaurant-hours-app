@@ -21,7 +21,8 @@ fun SwipeRefreshLayout(
     val pullToRefreshState = rememberPullToRefreshState()
 
     Box(
-        modifier = modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)
+        modifier = modifier
+            .nestedScroll(pullToRefreshState.nestedScrollConnection)
     ) {
         content()
         if (pullToRefreshState.isRefreshing) {

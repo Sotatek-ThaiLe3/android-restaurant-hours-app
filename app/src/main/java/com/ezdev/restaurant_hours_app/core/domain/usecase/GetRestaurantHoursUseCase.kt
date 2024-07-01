@@ -1,26 +1,39 @@
 package com.ezdev.restaurant_hours_app.core.domain.usecase
 
 import com.ezdev.restaurant_hours_app.common.Resource
+import com.ezdev.restaurant_hours_app.connectivity_observer.ConnectivityObserver
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
-import com.ezdev.restaurant_hours_app.core.domain.repository.Repository
+import com.ezdev.restaurant_hours_app.core.domain.repository.RestaurantRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import javax.inject.Inject
 
 class GetRestaurantHoursUseCase @Inject constructor(
-    private val repository: Repository
+    private val restaurantRepository: RestaurantRepository,
+    private val connectivityObserver: ConnectivityObserver
 ) {
     operator fun invoke(newRequest: Boolean = false): Flow<Resource<List<Restaurant>>> = flow {
-
+        println("newRequest $newRequest")
         emit(Resource.Loading())
 
         try {
-            repository.getRestaurants().collect { restaurants ->
-                if (restaurants.isEmpty() || newRequest) {
-                    repository.loadRestaurants()
+            combine(
+                restaurantRepository.getRestaurants(),
+                connectivityObserver.observe()
+            ) { restaurants, status ->
+                if (status != ConnectivityObserver.Status.AVAILABLE) {
+                    return@combine restaurants
                 }
-                emit(Resource.Success(restaurants))
+
+                if (restaurants.isEmpty() || newRequest) {
+                    restaurantRepository.loadRestaurants()
+                }
+
+                restaurants
+            }.collect {
+                emit(Resource.Success(it))
             }
         } catch (e: retrofit2.HttpException) {
             emit(Resource.Error("Oops, something went wrong!"))

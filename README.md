@@ -5,10 +5,8 @@
 - [x] App architecture
 - [x] App navigation
 - [x] Dependency injection
-- [ ] Feature: pull to refresh, observe network change, random background...
+- [x] Feature: pull to refresh, observe network change, random background...
+- [ ] Feature: random background...
 - [ ] Testing
-
-## Fixing
-- [ ] SwipeRefreshLayout: infinity loading
 
 

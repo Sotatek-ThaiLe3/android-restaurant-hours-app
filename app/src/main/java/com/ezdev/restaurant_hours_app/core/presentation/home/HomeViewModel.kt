@@ -1,5 +1,8 @@
 package com.ezdev.restaurant_hours_app.core.presentation.home
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezdev.restaurant_hours_app.common.Resource
@@ -8,8 +11,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,19 +25,18 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeUiState> = getRestaurantHoursUseCase()
         .map { result ->
             when (result) {
-                is Resource.Error -> HomeUiState(
-                    errorMessage = result.message ?: "Unknown error"
-                )
-
-                is Resource.Loading -> {
-                    delay(LOADING_MILLIS)
+                is Resource.Loading ->
                     HomeUiState(isLoading = true)
-                }
 
-                is Resource.Success -> HomeUiState(
-                    restaurants = result.data ?: emptyList()
-                )
+                is Resource.Error ->
+                    HomeUiState(errorMessage = result.message ?: "Unknown error")
+
+                is Resource.Success ->
+                    HomeUiState(restaurants = result.data ?: emptyList())
             }
+        }
+        .onEach {
+            delay(LOADING_MILLIS)
         }
         .stateIn(
             scope = viewModelScope,
@@ -39,13 +44,21 @@ class HomeViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS)
         )
 
+    var isRefreshing by mutableStateOf(false)
+        private set
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
-        private const val LOADING_MILLIS = 500L
+        private const val LOADING_MILLIS = 1_000L
     }
 
     fun loadRestaurants() {
-        getRestaurantHoursUseCase(newRequest = true)
+        viewModelScope.launch {
+            isRefreshing = true
+            getRestaurantHoursUseCase(newRequest = true).launchIn(this)
+            delay(LOADING_MILLIS)
+            isRefreshing = false
+        }
     }
 
 }

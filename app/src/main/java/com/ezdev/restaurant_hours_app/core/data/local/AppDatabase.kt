@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 
 @Database(entities = [RestaurantEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase(){
-    abstract fun dao(): Dao
+    abstract fun restaurantDao(): RestaurantDao
 
     companion object {
         const val DATABASE_NAME = "restaurant-hours.db"

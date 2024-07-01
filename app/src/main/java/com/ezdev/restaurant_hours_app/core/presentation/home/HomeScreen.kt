@@ -26,9 +26,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,7 +47,9 @@ fun HomeScreen(
     modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isRefreshing = viewModel.isRefreshing
 
+    println("uiState $uiState")
 
     Scaffold(
         topBar = {
@@ -60,17 +59,21 @@ fun HomeScreen(
     ) { innerPadding ->
         HomeBody(
             uiState = uiState,
-            onRefresh = viewModel::loadRestaurants,
+            isRefreshing = isRefreshing,
+            onLoadRestaurants = viewModel::loadRestaurants,
             onNavigateToItem = onNavigateToItem,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
         )
     }
 }
 
+
 @Composable
 private fun HomeBody(
     uiState: HomeUiState,
-    onRefresh: () -> Unit,
+    isRefreshing: Boolean,
+    onLoadRestaurants: () -> Unit,
     onNavigateToItem: (Screen.Item) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -84,7 +87,8 @@ private fun HomeBody(
                 // TODO Restaurant List
                 RestaurantList(
                     restaurants = uiState.restaurants,
-                    onRefresh = onRefresh,
+                    isRefreshing = isRefreshing,
+                    onLoadRestaurants = onLoadRestaurants,
                     onNavigateToItem = onNavigateToItem,
                 )
             }
@@ -95,19 +99,12 @@ private fun HomeBody(
 @Composable
 private fun RestaurantList(
     restaurants: List<Restaurant>,
-    onRefresh: () -> Unit,
+    isRefreshing: Boolean,
+    onLoadRestaurants: () -> Unit,
     onNavigateToItem: (Screen.Item) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isRefreshing by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    SwipeRefreshLayout(isRefreshing = isRefreshing, onRefresh = {
-        isRefreshing = true
-        onRefresh()
-        isRefreshing = false
-    }) {
+    SwipeRefreshLayout(isRefreshing = isRefreshing, onRefresh = onLoadRestaurants) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(8.dp),
@@ -178,7 +175,11 @@ private fun RestaurantItemPreview() {
 private fun Preview() {
     RestaurantHoursTheme {
         Surface {
-            HomeBody(uiState = HomeUiState(), onRefresh = {}, onNavigateToItem = {})
+            HomeBody(
+                uiState = HomeUiState(),
+                isRefreshing = false,
+                onLoadRestaurants = {},
+                onNavigateToItem = {})
         }
     }
 }
