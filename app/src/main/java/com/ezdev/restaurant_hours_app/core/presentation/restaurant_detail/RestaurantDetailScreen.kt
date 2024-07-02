@@ -1,4 +1,4 @@
-package com.ezdev.restaurant_hours_app.core.presentation.item
+package com.ezdev.restaurant_hours_app.core.presentation.restaurant_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,10 +21,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -36,15 +39,25 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ezdev.restaurant_hours_app.R
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ItemViewModel = hiltViewModel()
+    viewModel: RestaurantDetailViewModel = hiltViewModel()
 ) {
     val restaurant: Restaurant by viewModel.restaurant.collectAsStateWithLifecycle()
+    val backgroundColor = Color(
+        red = Random.nextFloat(),
+        green = Random.nextFloat(),
+        blue = Random.nextFloat(),
+        alpha = 0.1F
+    )
+    val containerColor: Color = remember {
+        backgroundColor
+    }
 
     Scaffold(
         topBar = {
@@ -69,20 +82,28 @@ fun ItemScreen(
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor)
             )
         },
-        modifier = modifier
+        containerColor = containerColor,
+        modifier = modifier,
     ) { innerPadding ->
-        ItemBody(restaurant = restaurant, modifier = Modifier.padding(innerPadding))
+        ItemBody(
+            restaurant = restaurant, modifier = Modifier
+                .padding(innerPadding)
+        )
     }
 }
+
 
 @Composable
 private fun ItemBody(restaurant: Restaurant, modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
     ) {
         WeeklyCalendarList(weeklyCalendar = restaurant.weeklyCalendar)
     }

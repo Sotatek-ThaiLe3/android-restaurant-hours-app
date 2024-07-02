@@ -2,13 +2,15 @@ package com.ezdev.restaurant_hours_app.core.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.createGraph
 import com.ezdev.restaurant_hours_app.core.presentation.home.HomeScreen
-import com.ezdev.restaurant_hours_app.core.presentation.item.ItemScreen
+import com.ezdev.restaurant_hours_app.core.presentation.restaurant_detail.ItemScreen
 
 
 @Composable
@@ -23,7 +25,7 @@ fun AppNavigation(
                 navController.navigate(it)
             })
         }
-        composable<Screen.Item> { ItemScreen(onNavigateBack = { navController.navigateUp() }) }
+        composable<Screen.RestaurantDetail> { ItemScreen(onNavigateBack = { navController.navigateBack() }) }
     }
 
 
@@ -33,3 +35,13 @@ fun AppNavigation(
         modifier = modifier
     )
 }
+
+val NavController.canGoBack: Boolean
+    get() = currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED
+
+fun NavController.navigateBack() {
+    if (canGoBack) {
+        popBackStack()
+    }
+}
+

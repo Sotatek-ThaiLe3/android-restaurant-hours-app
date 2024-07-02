@@ -5,8 +5,7 @@
 - [x] App architecture
 - [x] App navigation
 - [x] Dependency injection
-- [x] Feature: pull to refresh, observe network change, random background...
-- [ ] Feature: random background...
+- [x] Feature: Pull to refresh, Observe network change, Random background
 - [ ] Testing
 
 

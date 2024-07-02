@@ -18,42 +18,31 @@ class NetworkConnectivityObserver @Inject constructor(
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     override fun observe(): Flow<ConnectivityObserver.Status> = callbackFlow {
-        val currentStatus: ConnectivityObserver.Status = connectivityManager.activeNetwork?.let {
-            ConnectivityObserver.Status.AVAILABLE
-        } ?: ConnectivityObserver.Status.UNAVAILABLE
-        launch {
-            send(currentStatus)
-        }
-
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                launch {
-                    send(ConnectivityObserver.Status.AVAILABLE)
-                }
+                trySend(ConnectivityObserver.Status.AVAILABLE)
             }
 
             override fun onUnavailable() {
                 super.onUnavailable()
-                launch {
-                    send(ConnectivityObserver.Status.UNAVAILABLE)
-                }
+                trySend(ConnectivityObserver.Status.UNAVAILABLE)
             }
 
             override fun onLosing(network: Network, maxMsToLive: Int) {
                 super.onLosing(network, maxMsToLive)
-                launch {
-                    send(ConnectivityObserver.Status.LOSING)
-                }
+                trySend(ConnectivityObserver.Status.LOSING)
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                launch {
-                    send(ConnectivityObserver.Status.LOST)
-                }
+                trySend(ConnectivityObserver.Status.LOST)
             }
         }
+
+        val initialStatus = connectivityManager.activeNetwork?.let {
+            ConnectivityObserver.Status.AVAILABLE} ?: ConnectivityObserver.Status.UNAVAILABLE
+        trySend(initialStatus)
 
         connectivityManager.registerDefaultNetworkCallback(callback)
         awaitClose {

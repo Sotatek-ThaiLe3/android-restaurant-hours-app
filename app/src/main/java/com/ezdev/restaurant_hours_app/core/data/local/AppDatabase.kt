@@ -8,6 +8,6 @@ abstract class AppDatabase : RoomDatabase(){
     abstract fun restaurantDao(): RestaurantDao
 
     companion object {
-        const val DATABASE_NAME = "restaurant-hours.db"
+        const val DATABASE_NAME = "restaurant_hours.db"
     }
 }

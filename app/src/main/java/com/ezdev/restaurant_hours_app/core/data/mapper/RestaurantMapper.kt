@@ -15,5 +15,5 @@ fun RestaurantEntity.toRestaurant() = Restaurant(
     operatingHours = operatingHours
 )
 
-fun Restaurant.toItem() = Screen.Item(name = name)
+fun Restaurant.toDetail() = Screen.RestaurantDetail(name = name)
 

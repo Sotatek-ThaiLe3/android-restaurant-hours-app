@@ -31,12 +31,15 @@ class HomeViewModel @Inject constructor(
                 is Resource.Error ->
                     HomeUiState(errorMessage = result.message ?: "Unknown error")
 
+
                 is Resource.Success ->
                     HomeUiState(restaurants = result.data ?: emptyList())
             }
         }
         .onEach {
-            delay(LOADING_MILLIS)
+            if(it.isLoading) {
+                delay(LOADING_MILLIS)
+            }
         }
         .stateIn(
             scope = viewModelScope,

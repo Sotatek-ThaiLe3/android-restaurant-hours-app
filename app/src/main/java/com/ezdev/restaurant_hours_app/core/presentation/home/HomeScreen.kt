@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ezdev.restaurant_hours_app.core.data.mapper.toItem
+import com.ezdev.restaurant_hours_app.core.data.mapper.toDetail
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
 import com.ezdev.restaurant_hours_app.core.navigation.Screen
 import com.ezdev.restaurant_hours_app.ui.SwipeRefreshLayout
@@ -43,7 +43,7 @@ import com.ezdev.restaurant_hours_app.ui.theme.RestaurantHoursTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onNavigateToItem: (Screen.Item) -> Unit,
+    onNavigateToItem: (Screen.RestaurantDetail) -> Unit,
     modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState: HomeUiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -74,11 +74,15 @@ private fun HomeBody(
     uiState: HomeUiState,
     isRefreshing: Boolean,
     onLoadRestaurants: () -> Unit,
-    onNavigateToItem: (Screen.Item) -> Unit,
+    onNavigateToItem: (Screen.RestaurantDetail) -> Unit,
     modifier: Modifier = Modifier
 ) {
     //TODO UI status
-    Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxSize()) {
+    Box(
+        contentAlignment = Alignment.Center, modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
         when {
             uiState.isLoading -> CircularProgressIndicator()
             uiState.errorMessage.isNotBlank() -> Text(text = uiState.errorMessage)
@@ -101,7 +105,7 @@ private fun RestaurantList(
     restaurants: List<Restaurant>,
     isRefreshing: Boolean,
     onLoadRestaurants: () -> Unit,
-    onNavigateToItem: (Screen.Item) -> Unit,
+    onNavigateToItem: (Screen.RestaurantDetail) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SwipeRefreshLayout(isRefreshing = isRefreshing, onRefresh = onLoadRestaurants) {
@@ -120,7 +124,7 @@ private fun RestaurantList(
 @Composable
 private fun RestaurantItem(
     restaurant: Restaurant,
-    onNavigateToItem: (Screen.Item) -> Unit,
+    onNavigateToItem: (Screen.RestaurantDetail) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -138,7 +142,7 @@ private fun RestaurantItem(
         )
         HorizontalDivider(modifier = Modifier.width(16.dp))
         Card(
-            onClick = { onNavigateToItem(restaurant.toItem()) },
+            onClick = { onNavigateToItem(restaurant.toDetail()) },
 //            colors = CardDefaults.cardColors(containerColor = if (restaurant.isOpening) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer),
             modifier = Modifier.weight(1f)
         ) {

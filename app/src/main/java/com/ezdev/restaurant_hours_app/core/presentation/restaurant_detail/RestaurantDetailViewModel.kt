@@ -1,4 +1,4 @@
-package com.ezdev.restaurant_hours_app.core.presentation.item
+package com.ezdev.restaurant_hours_app.core.presentation.restaurant_detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -14,11 +14,11 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class ItemViewModel @Inject constructor(
+class RestaurantDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getRestaurantUseCase: GetRestaurantUseCase
 ) : ViewModel() {
-    private val name: String = checkNotNull(savedStateHandle.toRoute<Screen.Item>().name)
+    private val name: String = checkNotNull(savedStateHandle.toRoute<Screen.RestaurantDetail>().name)
 
     val restaurant: StateFlow<Restaurant> =
         getRestaurantUseCase(name)

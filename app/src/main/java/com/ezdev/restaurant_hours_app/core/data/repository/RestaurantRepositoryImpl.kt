@@ -22,7 +22,7 @@ class RestaurantRepositoryImpl @Inject constructor(
     }
 
     override fun getRestaurants(): Flow<List<Restaurant>> =
-        restaurantDao.getRestaurantsStream().map { list -> list.map { entity -> entity.toRestaurant() } }
+        restaurantDao.getAllRestaurantsStream().map { list -> list.map { entity -> entity.toRestaurant() } }
 
     override fun getRestaurant(name: String): Flow<Restaurant> =
         restaurantDao.getRestaurantStream(name).map { it?.toRestaurant() ?: Restaurant() }

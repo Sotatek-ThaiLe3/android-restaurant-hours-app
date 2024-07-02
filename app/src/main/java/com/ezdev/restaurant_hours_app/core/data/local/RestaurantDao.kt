@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface RestaurantDao {
     @Query("SELECT * FROM restaurants")
-     fun getRestaurantsStream(): Flow<List<RestaurantEntity>>
+     fun getAllRestaurantsStream(): Flow<List<RestaurantEntity>>
 
      @Query("SELECT * FROM restaurants WHERE name LIKE :name")
      fun getRestaurantStream(name: String): Flow<RestaurantEntity?>

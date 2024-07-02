@@ -7,7 +7,7 @@ sealed class Screen {
     data object Home : Screen()
 
     @Serializable
-    data class Item(
+    data class RestaurantDetail(
         val name: String,
     ) : Screen()
 }

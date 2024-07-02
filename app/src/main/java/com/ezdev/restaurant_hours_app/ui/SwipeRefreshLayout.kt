@@ -20,23 +20,23 @@ fun SwipeRefreshLayout(
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
 
+    if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            onRefresh()
+        }
+    }
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) {
+            pullToRefreshState.startRefresh()
+        } else {
+            pullToRefreshState.endRefresh()
+        }
+    }
     Box(
         modifier = modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
     ) {
         content()
-        if (pullToRefreshState.isRefreshing) {
-            LaunchedEffect(true) {
-                onRefresh()
-            }
-        }
-        LaunchedEffect(isRefreshing) {
-            if (isRefreshing) {
-                pullToRefreshState.startRefresh()
-            } else {
-                pullToRefreshState.endRefresh()
-            }
-        }
         PullToRefreshContainer(
             state = pullToRefreshState,
             modifier = Modifier
