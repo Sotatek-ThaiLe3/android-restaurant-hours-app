@@ -17,15 +17,13 @@ class RestaurantRepositoryImpl @Inject constructor(
 ) : RestaurantRepository {
     override suspend fun loadRestaurants() {
         val remoteRestaurants: RestaurantsDto = restaurantApiService.fetchRestaurants()
-        val restaurantsEntity = remoteRestaurants.restaurants.map { it.toEntity() }
-        restaurantDao.upsertRestaurants(restaurantsEntity)
+        restaurantDao.upsertRestaurants(remoteRestaurants.restaurants.map { dto -> dto.toEntity() })
     }
 
     override fun getRestaurants(): Flow<List<Restaurant>> =
-        restaurantDao.getAllRestaurantsStream().map { list -> list.map { entity -> entity.toRestaurant() } }
+        restaurantDao.getAllRestaurantsStream()
+            .map { list -> list.map { entity -> entity.toRestaurant() } }
 
-    override fun getRestaurant(name: String): Flow<Restaurant> =
-        restaurantDao.getRestaurantStream(name).map { it?.toRestaurant() ?: Restaurant() }
-
-
+    override fun getRestaurant(name: String): Flow<Restaurant?> =
+        restaurantDao.getRestaurantStream(name).map { entity -> entity?.toRestaurant() }
 }

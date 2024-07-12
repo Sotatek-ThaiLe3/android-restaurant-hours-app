@@ -1,4 +1,4 @@
-package com.ezdev.restaurant_hours_app.connectivity_observer
+package com.ezdev.restaurant_hours_app.connectivity
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -8,7 +8,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class NetworkConnectivityObserver @Inject constructor(

@@ -1,4 +1,4 @@
-package com.ezdev.restaurant_hours_app.connectivity_observer
+package com.ezdev.restaurant_hours_app.connectivity
 
 import kotlinx.coroutines.flow.Flow
 

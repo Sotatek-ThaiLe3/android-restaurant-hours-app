@@ -26,24 +26,22 @@ class HomeViewModel @Inject constructor(
         .map { result ->
             when (result) {
                 is Resource.Loading ->
-                    HomeUiState(isLoading = true)
+                    HomeUiState(isLoading = true, restaurants = result.data ?: emptyList())
 
                 is Resource.Error ->
-                    HomeUiState(errorMessage = result.message ?: "Unknown error")
+                    HomeUiState(
+                        errorMessage = result.message ?: "Unknown error",
+                        restaurants = result.data ?: emptyList()
+                    )
 
 
                 is Resource.Success ->
                     HomeUiState(restaurants = result.data ?: emptyList())
             }
         }
-        .onEach {
-            if(it.isLoading) {
-                delay(LOADING_MILLIS)
-            }
-        }
         .stateIn(
             scope = viewModelScope,
-            initialValue = HomeUiState(),
+            initialValue = HomeUiState(isLoading = true),
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS)
         )
 

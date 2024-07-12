@@ -1,7 +1,7 @@
 package com.ezdev.restaurant_hours_app.core.domain.usecase
 
 import com.ezdev.restaurant_hours_app.common.Resource
-import com.ezdev.restaurant_hours_app.connectivity_observer.ConnectivityObserver
+import com.ezdev.restaurant_hours_app.connectivity.ConnectivityObserver
 import com.ezdev.restaurant_hours_app.core.domain.model.Restaurant
 import com.ezdev.restaurant_hours_app.core.domain.repository.RestaurantRepository
 import kotlinx.coroutines.flow.Flow

@@ -18,7 +18,8 @@ class RestaurantDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getRestaurantUseCase: GetRestaurantUseCase
 ) : ViewModel() {
-    private val name: String = checkNotNull(savedStateHandle.toRoute<Screen.RestaurantDetail>().name)
+    private val name: String =
+        checkNotNull(savedStateHandle.toRoute<Screen.RestaurantDetail>().name)
 
     val restaurant: StateFlow<Restaurant> =
         getRestaurantUseCase(name)

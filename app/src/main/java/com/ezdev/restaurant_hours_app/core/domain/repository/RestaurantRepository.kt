@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface RestaurantRepository {
     suspend fun loadRestaurants()
     fun getRestaurants(): Flow<List<Restaurant>>
-    fun getRestaurant(name: String): Flow<Restaurant>
+    fun getRestaurant(name: String): Flow<Restaurant?>
 }

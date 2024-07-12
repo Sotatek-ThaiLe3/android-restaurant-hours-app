@@ -2,14 +2,11 @@ package com.ezdev.restaurant_hours_app.core.di
 
 import android.content.Context
 import androidx.room.Room
-import com.ezdev.restaurant_hours_app.connectivity_observer.ConnectivityObserver
-import com.ezdev.restaurant_hours_app.connectivity_observer.NetworkConnectivityObserver
 import com.ezdev.restaurant_hours_app.core.data.local.AppDatabase
 import com.ezdev.restaurant_hours_app.core.data.local.RestaurantDao
 import com.ezdev.restaurant_hours_app.core.data.remote.RestaurantApiService
 import com.ezdev.restaurant_hours_app.core.data.repository.RestaurantRepositoryImpl
 import com.ezdev.restaurant_hours_app.core.domain.repository.RestaurantRepository
-import com.ezdev.restaurant_hours_app.core.domain.usecase.GetRestaurantHoursUseCase
 import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
@@ -41,7 +38,7 @@ abstract class AppModule {
 
         @Singleton
         @Provides
-        fun provideAppApi(): Retrofit =
+        fun provideRetrofit(): Retrofit =
             Retrofit.Builder()
                 .baseUrl(RestaurantApiService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(Gson()))
@@ -53,21 +50,11 @@ abstract class AppModule {
             appApi: Retrofit
         ): RestaurantApiService =
             appApi.create(RestaurantApiService::class.java)
-
-        @Singleton
-        @Provides
-        fun provideGetRestaurantHoursUseCase(
-            restaurantRepository: RestaurantRepository,
-            connectivityObserver: ConnectivityObserver
-        ): GetRestaurantHoursUseCase =
-            GetRestaurantHoursUseCase(restaurantRepository, connectivityObserver)
     }
 
     @Singleton
     @Binds
     abstract fun bindRestaurantRepository(restaurantRepositoryImpl: RestaurantRepositoryImpl): RestaurantRepository
 
-    @Singleton
-    @Binds
-    abstract fun bindConnectivityObserver(networkConnectivityObserver: NetworkConnectivityObserver): ConnectivityObserver
+
 }
